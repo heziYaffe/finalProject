@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Choose File{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+  <form method="post">
+    <label for="file_name">File Name</label>
+    <input name="file_name" id="file_name" required>
+    <label for="filter">Filter By</label>
+    <input name="filter" id="filter" required>
+    <input type="submit" value="Submit">
+  </form>
+
+   <div>
+   This is a list of the files you just uploaded, click on them to load/download them
+   <ul>
+     {% if g.user %}
+       <table style="width:100%">
+        <tr>
+          <th>File Name</th>
+          <th>Upload Date</th>
+        </tr>
+        {% for file in session['uploaded_files'] %}
+          <tr>
+            <td><a href={{url_for('files.analyze', file_name=file)}}>{{file}}</a></td>
+          </tr>
+        {% endfor %}
+        </table>
+
+
+      <!--{% for file in g.user['uploaded_files'] %}
+        <li>{{file}}</li>
+      {% endfor %}
+      -->
+     {% endif %}
+
+   </ul>
+   </div>
+
+
+
+<!--
+  <p id="f"></p>
+  <input type="file" name="client-file" id="get-files" multiple />
+  <script>
+  var inp = document.getElementById("get-files");
+      document.getElementById("f").innerHTML = "Hello JavaScript!";
+  var audio = new Audio('audio_file.mp3');
+  audio.play();
+  for (i = 0; i < inp.files.length; i++) {
+      let file = inp.files[i];
+  }
+  </script>
+-->
+{% endblock %}

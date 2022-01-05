@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Upload audio file{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <p>When you done upload all your new files, click on the button at the bottom and start analyze!</p>
+  {{ dropzone.load_css() }}
+  {{ dropzone.style('border: 2px dashed #0087f7; margin:10%; min-height:400px;') }}
+  {{ dropzone.create(action='files.upload') }}
+  {{ dropzone.load_js() }}
+  {{ dropzone.config() }}
+  <a href={{url_for('files.choose_file')}}>Start Analyze!</a>
+
+{% endblock %}

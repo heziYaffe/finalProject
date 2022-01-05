@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Upload audio file{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <div>
+        <p>
+            hello! here you can upload new file or choose existing file to analyze
+        </p>
+        <a href={{url_for('files.upload')}}>Upload New File</a>
+        <a href={{url_for('files.choose_file')}}>Choose File</a>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Upload audio file{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <script>
+        function hide(alg) {
+            document.getElementById(alg).style.display = "none";
+        }
+        function show(alg) {
+            document.getElementById(alg).style.display = "block";
+        }
+
+        function yesnoCheck(algorithm) {
+            if (algorithm.value == "VAD") {
+                show("VAD");
+                hide("Specific_Sounds");
+            }
+            if (algorithm.value == "Specific_Sounds") {
+                show("Specific_Sounds");
+                hide("VAD");
+            }
+        }
+    </script>
+    <div>
+    {% if g.user %}
+        <p>analyze {{ file_name }}:</p>
+        <form method="post">
+            <select onchange="yesnoCheck(this);" name="algorithm" required>
+                <option value="VAD">VAD</option>
+                <option value="Specific_Sounds">Specific Sounds</option>
+                <option value="Key Words">Key Words</option>
+            </select>
+            <div id="VAD" style="display: none;">
+                <p>VAD</p>
+            </div>
+            <div id="Specific_Sounds" style="display: none;">
+                <p>Specific Sounds</p>
+            </div>
+            <input type="submit" value="Submit">
+        </form>
+    {% endif %}
+    </div>
+
+
+{% endblock %}

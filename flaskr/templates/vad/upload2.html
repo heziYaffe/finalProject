@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Upload audio file{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  {{ dropzone.load_css() }}
+  {{ dropzone.style('border: 2px dashed #0087f7; margin:10%; min-height:400px;') }}
+  {{ dropzone.create(action='files.upload') }}
+  {{ dropzone.load_js() }}
+  {{ dropzone.config() }}
+
+<script language="JavaScript">
+      function processUser()
+      {
+        parameters = window.location;
+        console.log(parameters);
+        document.getElementById("file_name").innerHTML = parameters;
+      }
+      processUser();
+    </script>
+{% endblock %}
+
