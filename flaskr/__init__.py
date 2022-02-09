@@ -12,11 +12,14 @@ dropzone = Dropzone()
 ALGORITHMS = ["VAD", "a", "b"]
 
 def create_app(test_config=None):
+    # creates the Flask instance,__name__ is the name of the current Python module.
+    # The app needs to know where it’s located to set up some paths
     app = Flask(__name__)
     dropzone.init_app(app)
+    # sets some configuration that the app will use
     app.config.from_object('config')
     app.config.update(
-        DATABASE = os.path.join(app.instance_path, 'flaskr.sqlite')
+        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite')
     )
     create_dir_in_path(app.config["BASE_DIR"], "uploads")
     create_dir_in_path(app.config["BASE_DIR"], "audioChunks")
@@ -29,9 +32,11 @@ def create_app(test_config=None):
     def hello():
         return 'Hello, World!'
 
+    # register close_db and init_db_command functions with the app instance
     from . import db
     db.init_app(app)
 
+    # register auth.bp blueprint with the app instance
     from . import auth
     app.register_blueprint(auth.bp)
 

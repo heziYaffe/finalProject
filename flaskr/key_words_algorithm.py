@@ -1,45 +1,100 @@
-import os
+import math
 
+import speech_recognition as sr
+import os
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
 
+from flaskr.Algorithm import Algorithm
+from flaskr.helper import Audio_Chunk
+from flaskr.helper import split_audio_to_chunks
 
-class Audio_Chunk:
-    def __init__(self, file_name, original_file_name, original_interval):
-        self.file_name = file_name
-        self.original_file_name = original_file_name
-        self.original_interval = original_interval
+class Key_Words_Alg(Algorithm):
+    r = sr.Recognizer()
 
-    def __str__(self):
-        text = "file name: %s\n" \
-               "original file name: %s\n"\
-               "audio apper in %s in the original audio" % \
-               (self.file_name, self.original_file_name, self.original_interval)
-        return text
+    def filter(self, chunk_filename, word):
+        text = self.convert_audio_to_text(chunk_filename)
+        if word in text:
+            print(text)
+            return True
+        else:
+            return False
 
-    def serialize(self):
-        return {
-            'file_name': self.file_name,
-            'original_file_name': self.original_file_name,
-            'original_interval': self.original_interval,
-        }
+    def convert_audio_to_text(self, chunk_file_name):
+        with sr.AudioFile(chunk_file_name) as source:
+            audio_listened = self.r.record(source)
+            # try converting it to text
+            try:
+                text = self.r.recognize_google(audio_listened)
+            except sr.UnknownValueError as e:
+                print("Error:", str(e))
+            else:
+                return text
+'''
+# initialize the recognizer
 
-def create_dir_in_path(p, dir_name):
-    # Directory
-    directory = dir_name
+r = sr.Recognizer()
+
+filename = "Welcome.wav"
+
+def filter(chunk_filename, word):
+    text = convert_audio_to_text(chunk_filename)
+    if word in text:
+        return True
+'''
+'''
+# a function that splits the audio file into chunks
+# and applies speech recognition
+def get_large_audio_transcription(upload_dir_path, chunks_dir_path, param, file_name):
+    #Welcome.wav
+    chunks = split_audio_to_chunks(upload_dir_path, file_name)
+
+    # remove format from file name (.wav, mp3 etc...)
+    file_name = remove_file_format_from_name(file_name)
+
+    param_indexs = []
+    # chunks start and end in the original audio file
+    chunks_at_original_audio = []
+
+    chunk_start = 0
+    chunk_end = 0
+
+    # process each chunk
+    for i, audio_chunk in enumerate(chunks):
+        # export audio chunk and save it in the chunk's directory.
+        chunk_filename = save_audio_chunk(chunks_dir_path, file_name, audio_chunk, i)
+
+        chunk_end = chunk_start
+        chunk_start = chunk_end + len(audio_chunk)/1000
+        chunks_at_original_audio.append((chunk_end, chunk_start))
+        if filter(chunk_filename, param):
+            param_indexs.append((i, param))
+
+    return param_indexs, i, chunks_at_original_audio
 
 
-    # Parent Directory path
-    parent_dir = p
+# export audio chunk and save it in the chunk's directory.
+# and return the name of the saved chunk
+def save_audio_chunk(chunks_dir_path, file_name, audio_chunk, chunk_num):
+    chunk_file_name = os.path.join(chunks_dir_path, f"{file_name}_chunk{chunk_num}.wav")
+    audio_chunk.export(chunk_file_name, format="wav")
+    return chunk_file_name
+'''
 
-    # Path
-    path = os.path.join(parent_dir, directory)
-
-    # Create the directory if dosent exist
-    if not os.path.exists(path):
-        os.makedirs(path)
-    print("Directory '% s' created" % directory)
-
+'''
+def convert_audio_to_text(chunk_file_name):
+    with sr.AudioFile(chunk_file_name) as source:
+        audio_listened = r.record(source)
+        # try converting it to text
+        try:
+            text = r.recognize_google(audio_listened)
+        except sr.UnknownValueError as e:
+            print("Error:", str(e))
+        else:
+            return text
+'''
+'''
+#Splitting the large audio file into chunks
 def split_audio_to_chunks(upload_dir_path, file_name):
     path = os.path.join(upload_dir_path, file_name)
     # open the audio file using pydub
@@ -54,7 +109,9 @@ def split_audio_to_chunks(upload_dir_path, file_name):
                               keep_silence=500,
                               )
     return chunks
+'''
 
+'''
 # combine segment that contain each other into one segment
 def combine_similar_segments(segments, segments_interval):
     new_segments = []
@@ -122,11 +179,11 @@ def create_audio_segment(start, end, chunks_dir_path, word, segment_num, file_na
 def remove_file_format_from_name(file_name):
     return file_name.split('.')[0]
 
-def find_specific_param(upload_dir_path, chunks_dir_path, file_name, param):
-    param_indexes, chunks_num, chunks_at_original_audio = get_large_audio_transcription(upload_dir_path, chunks_dir_path, param, file_name)
-    if not param_indexes:
-        return f"audio file doesnt contain the word {param}"
-    new_segments = combine_similar_segments(get_relevant_chunks(param_indexes, chunks_num),
+def find_specific_word(upload_dir_path, chunks_dir_path, file_name, words):
+    words_indexes, chunks_num, chunks_at_original_audio = get_large_audio_transcription(upload_dir_path, chunks_dir_path, words, file_name)
+    if not words_indexes:
+        return f"audio file doesnt contain the word {words}"
+    new_segments = combine_similar_segments(get_relevant_chunks(words_indexes, chunks_num),
                                             chunks_at_original_audio)
     file_name_without_format = remove_file_format_from_name(file_name)
 
@@ -139,45 +196,13 @@ def find_specific_param(upload_dir_path, chunks_dir_path, file_name, param):
         # the created file contain all the chunks from X to Y
         # filename_chunkX.wav - filename_chunkY.wav
         segment_interval = segment[0]
-        new_segment_name = create_audio_segment(segment_interval[0], segment_interval[1], chunks_dir_path, param, i, file_name_without_format)
+        new_segment_name = create_audio_segment(segment_interval[0], segment_interval[1], chunks_dir_path, words, i, file_name_without_format)
         audio_chunks.append(Audio_Chunk(new_segment_name, file_name, segment_original_time_interval))
 
     return audio_chunks
-'''
-# a function that splits the audio file into chunks
-# and applies speech recognition
-def get_large_audio_transcription(upload_dir_path, chunks_dir_path, param, file_name):
-    #Welcome.wav
-    chunks = split_audio_to_chunks(upload_dir_path, file_name)
 
-    # remove format from file name (.wav, mp3 etc...)
-    file_name = remove_file_format_from_name(file_name)
-
-    param_indexs = []
-    # chunks start and end in the original audio file
-    chunks_at_original_audio = []
-
-    chunk_start = 0
-    chunk_end = 0
-
-    # process each chunk
-    for i, audio_chunk in enumerate(chunks):
-        # export audio chunk and save it in the chunk's directory.
-        chunk_filename = save_audio_chunk(chunks_dir_path, file_name, audio_chunk, i)
-
-        chunk_end = chunk_start
-        chunk_start = chunk_end + len(audio_chunk)/1000
-        chunks_at_original_audio.append((chunk_end, chunk_start))
-        if filter(chunk_filename, param):
-            print(i)
-            param_indexs.append((i, param))
-
-    return param_indexs, i, chunks_at_original_audio
 '''
 
-# export audio chunk and save it in the chunk's directory.
-# and return the name of the saved chunk
-def save_audio_chunk(chunks_dir_path, file_name, audio_chunk, chunk_num):
-    chunk_file_name = os.path.join(chunks_dir_path, f"{file_name}_chunk{chunk_num}.wav")
-    audio_chunk.export(chunk_file_name, format="wav")
-    return chunk_file_name
+
+
+

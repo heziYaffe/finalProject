@@ -23,9 +23,14 @@
           <th>File Name</th>
           <th>Upload Date</th>
         </tr>
-        {% for file in session['uploaded_files'] %}
+
+        {% for audio in audios %}
           <tr>
-            <td><a href={{url_for('files.analyze', file_name=file)}}>{{file}}</a></td>
+            <!--<td><a href={{url_for('files.analyze', file_name=file)}}>{{file}}</a></td>-->
+              <!--<a href={{url_for('files.analyze', file_name=audio['file_name'])}}>{{audio['file_name']}}</a>-->
+              <td><a href={{url_for('files.analyze', file_name=audio['file_name'])}}>{{audio['file_name']}}</a></td>
+              <td>{{audio['upload_date']}}</td>
+
           </tr>
         {% endfor %}
         </table>

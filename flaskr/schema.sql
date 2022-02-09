@@ -1,17 +1,27 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS post;
 DROP TABLE IF EXISTS audio;
+DROP TABLE IF EXISTS useraudios;
+
 
 CREATE TABLE audio (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
   file_name TEXT UNIQUE NOT NULL,
-  file_location Text NOT NULL
+  file_location TEXT NOT NULL,
+  upload_date TEXT NOT NULL
 );
 
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL
+);
+
+CREATE TABLE useraudios (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id TEXT NOT NULL,
+  file_name TEXT NOT NULL
 );
 
 CREATE TABLE post (

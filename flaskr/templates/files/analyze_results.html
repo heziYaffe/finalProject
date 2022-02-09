@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}analyze audio file{% endblock %}</h1>
+  <h1>{% block title %}Analyze Results{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
@@ -37,30 +37,51 @@
             }
         }
     </script>
-    <div>
-    {% if g.user %}
-        <p>analyze {{ file_name }}:</p>
-        <form method="post">
-            <label for="algorithm">Choose an algorithm:</label>
-            <select onchange="yesnoCheck(this);" name="algorithm" id="algorithm" required>
-                <option value="VAD">VAD</option>
-                <option value="Specific_Sounds">Specific Sounds</option>
-                <option value="Key_Words">Key Words</option>
-            </select>
-            <div id="VAD" style="display: block;">
-                <p>VAD</p>
-            </div>
-            <div id="Key_Words" style="display: none;">
-                <label>Choose word to search:</label>
-                <input name="word" id="word">
-            </div>
-            <div id="Specific_Sounds" style="display: none;">
-                <label>Choose specific emotion to search:</label>
-                <input name="sound" id="sound">
-            </div>
-            <input type="submit" value="Submit">
-        </form>
-    {% endif %}
-    </div>{{answer}}</div>
+<div>
+   This is a list of the files you just uploaded, click on them to load/download them
+   <ul>
+     {% if g.user %}
+       <table style="width:100%">
+        <tr>
+          <th>File Name</th>
+          <th>Upload Date</th>
+        </tr>
+           {% for audio in audios %}
+            <tr>
+                <td>
+                <audio controls>
+
+                      <source src="{{ url_for('files.download_file', filename=audio['file_name'])}}" type="audio/wav">
+                          Your browser does not support the audio element.!-->
+                </audio>
+                </td>
+                <td>Upload Date</td>
+            </tr>
+           {% endfor %}
+
+       </table>
+
+
+        <!--{% for audio in audios %}
+          <tr>
+              <td>
+                  <audio controls>
+                  <source src="Welcome2_management_0.wav" type="audio/wav">
+                      Your browser does not support the audio element.
+                  </audio>
+              </td>
+              <td><a href={{url_for('files.analyze', file_name=audio['file_name'])}}>{{audio['file_name']}}</a></td>
+              <td>{{audio['upload_date']}}</td>
+          </tr>
+        {% endfor %}
+        </table>
+
+
+
+     {% endif %}
+
+   </ul>
+   </div>-->
+
 
 {% endblock %}

@@ -136,47 +136,37 @@ def vad_collector(sample_rate, frame_duration_ms,
 
 
 def main(args, p, file_name):
-    print("this is the path of chunks directory:\n")
-    print(p)
+    print(f"path of chunks directory: {p}")
     if len(args) != 2:
         sys.stderr.write(
             'Usage: example.py <aggressiveness> <path to wav file>\n')
         sys.exit(1)
-    # Directory
-    directory = file_name
 
+
+    # Directory name
+    directory = file_name
     # Parent Directory path
     parent_dir = p
-
     # Path
     path = os.path.join(parent_dir, directory)
-
-    # Create the directory
-    # 'GeeksForGeeks' in
-    # '/home / User / Documents'
+    # if doesn't exists, Create the directory in path
     if not os.path.exists(path):
         os.makedirs(path)
         print("Directory '% s' created" % directory)
 
+
+    # if doesn't exists, Create the directory in path
     path = os.path.join(path, "VAD")
     if not os.path.exists(path):
         os.makedirs(path)
-        print("Directory '% s' created" % directory)
+        print("VAD Directory created")
+
     audio, sample_rate = read_wave(args[1])
     vad = webrtcvad.Vad(int(args[0]))
     frames = frame_generator(30, audio, sample_rate)
     frames = list(frames)
     segments = vad_collector(sample_rate, 30, 300, vad, frames)
-    path_To_Vad = path
+    path_to_vad_dir = path
     for i, segment in enumerate(segments):
-        #path = 'chunk-%002d.wav' % (i,)
-        #print(p)
-        #path = os.path.join(path_To_Vad, 'chunk-%002d.wav' % (i,))
-        path = os.path.join(path_To_Vad, f'VAD_{i}_{file_name}')
-
-        #print(' Writing %s' % (path,))
+        path = os.path.join(path_to_vad_dir, f'VAD_{i}_{file_name}')
         write_wave(path, segment, sample_rate)
-
-
-#if __name__ == '__main__':
-    #main(sys.argv[1:])
