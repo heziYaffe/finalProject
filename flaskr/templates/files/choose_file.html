@@ -6,47 +6,55 @@
 
 {% block content %}
 
-  <form method="post">
-    <label for="file_name">File Name</label>
-    <input name="file_name" id="file_name" required>
-    <label for="filter">Filter By</label>
-    <input name="filter" id="filter" required>
-    <input type="submit" value="Submit">
-  </form>
+   <div class="choose_file">
+   This is a list of the files you upload, click on the file you want to analyze
+       <input type="text" id="search" class="search_file" placeholder="Type to search">
+         {% if g.user %}
+           <table style="width:100%" id="table">
+            <tr>
+              <th>File Name</th>
+              <th>Upload Date</th>
+            </tr>
 
-   <div>
-   This is a list of the files you just uploaded, click on them to load/download them
-   <ul>
-     {% if g.user %}
-       <table style="width:100%">
-        <tr>
-          <th>File Name</th>
-          <th>Upload Date</th>
-        </tr>
+            {% for audio in audios %}
+              <tr class="table_element" id="table_element">
+                <!--<td><a href={{url_for('files.analyze', file_name=file)}}>{{file}}</a></td>-->
+                  <!--<a href={{url_for('files.analyze', file_name=audio['file_name'])}}>{{audio['file_name']}}</a>-->
+                  <td><a class="regular_text" href={{url_for('files.analyze', file_name=audio['file_name'])}}>{{audio['file_name']}}</a></td>
+                  <td>{{audio['upload_date']}}</td>
 
-        {% for audio in audios %}
-          <tr>
-            <!--<td><a href={{url_for('files.analyze', file_name=file)}}>{{file}}</a></td>-->
-              <!--<a href={{url_for('files.analyze', file_name=audio['file_name'])}}>{{audio['file_name']}}</a>-->
-              <td><a href={{url_for('files.analyze', file_name=audio['file_name'])}}>{{audio['file_name']}}</a></td>
-              <td>{{audio['upload_date']}}</td>
-
-          </tr>
-        {% endfor %}
-        </table>
+              </tr>
+            {% endfor %}
+            </table>
 
 
-      <!--{% for file in g.user['uploaded_files'] %}
-        <li>{{file}}</li>
-      {% endfor %}
-      -->
-     {% endif %}
+          <!--{% for file in g.user['uploaded_files'] %}
+            <li>{{file}}</li>
+          {% endfor %}
+          -->
+         {% endif %}
 
-   </ul>
    </div>
 
+<script type='text/javascript' src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script>
 
+    $(document).ready(function(){
+        var $rows = $('#table tr.table_element');
+        $('#search').keyup(function() {
 
+            var val = '^(?=.*\\b' + $.trim($(this).val()).split(/\s+/).join('\\b)(?=.*\\b') + ').*$',
+                reg = RegExp(val, 'i'),
+                text;
+
+            $rows.show().filter(function() {
+                text = $(this).text().replace(/\s+/g, ' ');
+                return !reg.test(text);
+            }).hide();
+        });
+    })
+
+</script>
 <!--
   <p id="f"></p>
   <input type="file" name="client-file" id="get-files" multiple />
@@ -59,5 +67,13 @@
       let file = inp.files[i];
   }
   </script>
+
+    <form method="post">
+    <label for="file_name">File Name</label>
+    <input name="file_name" id="file_name" required>
+    <label for="filter">Filter By</label>
+    <input name="filter" id="filter" required>
+    <input type="submit" value="Submit">
+  </form>
 -->
 {% endblock %}

@@ -5,12 +5,23 @@
 {% endblock %}
 
 {% block content %}
-  <p>When you done upload all your new files, click on the button at the bottom and start analyze!</p>
-  {{ dropzone.load_css() }}
-  {{ dropzone.style('border: 2px dashed #0087f7; margin:10%; min-height:400px;') }}
-  {{ dropzone.create(action='files.upload') }}
-  {{ dropzone.load_js() }}
-  {{ dropzone.config() }}
-  <a href={{url_for('files.choose_file')}}>Start Analyze!</a>
+<body class="upload_body">
+  <div d_and_d_container>
+    {{ dropzone.load_css() }}
+    <style>
+      .dropzone {
+        margin-left:20%;
+        margin-right:20%;
+        margin-top:5%;
+
+      }
+    </style>
+    <!--border: 2px dashed #0087F7;*/-->
+    {{ dropzone.create(action='files.upload') }}
+    {{ dropzone.load_js() }}
+    {{ dropzone.config() }}
+      <a href={{url_for('files.choose_file')}} class="button start_analyze">Start Analyze!</a>
+  </div>
+</body>
 
 {% endblock %}

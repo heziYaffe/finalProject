@@ -5,12 +5,15 @@
 {% endblock %}
 
 {% block content %}
-    <div>
-        <p>
-            hello! here you can upload new file or choose existing file to analyze
-        </p>
+    <div class="choose_upload">
+        <a class="button choose" href={{url_for('files.upload')}}>Upload File</a>
+        <a class="button upload" href={{url_for('files.choose_file')}}>Choose File</a>
+
+        <!--<button class="choose_btn">Upload New File</button>-->
+        <!--<button class="choose_btn">Choose File</button>-->
+        <!--
         <a href={{url_for('files.upload')}}>Upload New File</a>
-        <a href={{url_for('files.choose_file')}}>Choose File</a>
+        <a href={{url_for('files.choose_file')}}>Choose File</a>-->
     </div>
 
 {% endblock %}

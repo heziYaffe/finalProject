@@ -11,6 +11,7 @@
         <tr>
             <th>File Name</th>
             <th>Audio</th>
+            <th>Emotion</th>
             <th>Segment At Original File</th>
         </tr>
         {% for audio in audios %}
@@ -19,12 +20,12 @@
             <td>
                 <audio controls>
 
-                    <source src="{{ url_for('files.download_file',
-                    original_file_name=audio['original_file_name'],
+                    <source src="{{ url_for('files.download_file', original_file_name=audio['original_file_name'],
                      file_name=audio['file_name'], alg_name=audio['alg'])}}" type="audio/wav">
                     Your browser does not support the audio element.!-->
                 </audio>
             </td>
+            <td class="emotion">happy</td>
             <td>{{audio['original_interval']}}</td>
         </tr>
         {% endfor %}
@@ -32,5 +33,21 @@
     </table>
 </div>
 
+<script>
+
+    document.querySelectorAll(".emotion").forEach(function(item) {
+  if (item.innerText.trim() === "happy") {
+    item.innerText = "😀";
+  } else if (item.innerText.trim() === "sad") {
+    item.innerText = "Aucun";
+  } else if (item.innerText.trim() === "sad") {
+    item.innerText = "Aucun";
+  } else if (item.innerText.trim() === "sad") {
+    item.innerText = "Aucun";
+  } else {
+    item.innerText = "Aucun";
+  }
+});
+</script>
 
 {% endblock %}

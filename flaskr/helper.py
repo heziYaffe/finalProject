@@ -5,16 +5,18 @@ from pydub.silence import split_on_silence
 
 
 class Audio_Chunk:
-    def __init__(self, file_name, original_file_name, original_interval):
+    def __init__(self, file_name, original_file_name, original_interval, alg):
         self.file_name = file_name
         self.original_file_name = original_file_name
+        self.alg = alg
         self.original_interval = original_interval
 
     def __str__(self):
         text = "file name: %s\n" \
                "original file name: %s\n"\
+               "detect by %s algorithm\n"\
                "audio apper in %s in the original audio" % \
-               (self.file_name, self.original_file_name, self.original_interval)
+               (self.file_name, self.original_file_name,self.alg, self.original_interval)
         return text
 
     def serialize(self):
@@ -24,13 +26,13 @@ class Audio_Chunk:
             'original_interval': self.original_interval,
         }
 
-def create_dir_in_path(p, dir_name):
+def create_dir_in_path(parent_directory, dir_name):
     # Directory
     directory = dir_name
 
 
     # Parent Directory path
-    parent_dir = p
+    parent_dir = parent_directory
 
     # Path
     path = os.path.join(parent_dir, directory)
@@ -38,7 +40,14 @@ def create_dir_in_path(p, dir_name):
     # Create the directory if dosent exist
     if not os.path.exists(path):
         os.makedirs(path)
-    print("Directory '% s' created" % directory)
+        print("Directory '% s' created" % directory)
+
+def create_alg_dir(chunks_dir_path, file_name, alg):
+    file_name = file_name + ".wav"
+    create_dir_in_path(chunks_dir_path, file_name)
+    path = os.path.join(chunks_dir_path, file_name)
+    create_dir_in_path(path, alg)
+    return os.path.join(path, alg)
 
 def split_audio_to_chunks(upload_dir_path, file_name):
     path = os.path.join(upload_dir_path, file_name)
@@ -80,9 +89,9 @@ def combine_similar_segments(segments, segments_interval):
 
 # get the 3 chunks before and after the chunk that contain
 # the word
-def get_relevant_chunks(words_indexs, chunks_num):
+def get_relevant_chunks(object_indexs, chunks_num):
     segments = []
-    for i in words_indexs:
+    for i in object_indexs:
         if i[0] > 2:
             start = i[0] - 3
         else:
@@ -99,15 +108,31 @@ def get_relevant_chunks(words_indexs, chunks_num):
 
 # create new audio named "file_name" that is part of the original
 # audio in specific path
-def create_audio_segment(start, end, chunks_dir_path, word, segment_num, file_name):
+def create_audio_segment(start, end, chunks_dir_path, word, segment_num, file_name, alg_name):
+    create_alg_dir(chunks_dir_path, file_name, alg_name)
     word_segment = AudioSegment.empty()
     for i in range(end + 1):
         i = start + i
         sound = AudioSegment.from_file(f'{chunks_dir_path}/{file_name}_chunk{i}.wav')
         word_segment += sound
+    path = f"{chunks_dir_path}/{file_name}.wav/{alg_name}/{file_name}_{word}_{segment_num}.wav"
+    print("path is: " + path)
+    word_segment.export(path, format="wav")
+    #word_segment.export(f"C:\\Users\\Mirit\\PycharmProjects\\FinalCsProject\\audioChunks\\Welcome2.wav\\VAD/{file_name}_{word}_{segment_num}.wav", format="wav")
 
-    word_segment.export(f"{chunks_dir_path}/{file_name}_{word}_{segment_num}.wav", format="wav")
+    return f"{file_name}_{word}_{segment_num}.wav"
 
+'''
+    i = 0
+    while True:
+        if os.path.exists(f"{chunks_dir_path}/{file_name}_chunk{i}.wav"):
+            os.remove(f"{chunks_dir_path}/{file_name}_chunk{i}.wav")
+            i += 1
+        else:
+            break
+            '''
+
+def delete_chunks(chunks_dir_path, file_name):
     i = 0
     while True:
         if os.path.exists(f"{chunks_dir_path}/{file_name}_chunk{i}.wav"):
@@ -116,12 +141,12 @@ def create_audio_segment(start, end, chunks_dir_path, word, segment_num, file_na
         else:
             break
 
-    return f"{file_name}_{word}_{segment_num}.wav"
 
 # remove file format from file name (.mp3, .wav, etc...)
 def remove_file_format_from_name(file_name):
     return file_name.split('.')[0]
 
+'''
 def find_specific_param(upload_dir_path, chunks_dir_path, file_name, param):
     param_indexes, chunks_num, chunks_at_original_audio = get_large_audio_transcription(upload_dir_path, chunks_dir_path, param, file_name)
     if not param_indexes:
@@ -143,6 +168,7 @@ def find_specific_param(upload_dir_path, chunks_dir_path, file_name, param):
         audio_chunks.append(Audio_Chunk(new_segment_name, file_name, segment_original_time_interval))
 
     return audio_chunks
+'''
 '''
 # a function that splits the audio file into chunks
 # and applies speech recognition

@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}analyze audio file{% endblock %}</h1>
+<h1>{% block title %}analyze audio file{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-    <script>
+<script>
         function hide(alg) {
             document.getElementById(alg).style.display = "none";
         }
@@ -36,31 +36,82 @@
                 hide("VAD");
             }
         }
-    </script>
-    <div>
+
+
+
+
+
+
+</script>
+<!--
+<form>
+    <div class="container">
+        <h1>Analyze</h1>
+        <p>Choose the features according you want to analyze the file.</p>
+        <p>Dont worry, the original file will not corrupt.</p>
+        <label for="algorithm"><b>Choose an algorithm:</b></label>
+        <select onchange="yesnoCheck(this);" name="algorithm" id="algorithm" class="choose_algorithm" required>
+            <option value="VAD">VAD</option>
+            <option value="Specific_Sounds">Specific Sounds</option>
+            <option value="Key_Words">Key Words</option>
+        </select>
+        <div id="VAD" style="display: block;">
+            <p>VAD</p>
+        </div>
+        <div id="Key_Words" style="display: none;">
+            <label><b>Choose word to search:</b></label>
+            <input name="word" id="word" class="choose_word">
+        </div>
+        <div id="Specific_Sounds" style="display: none;">
+            <label><b>Choose specific emotion to search:</b></label>
+            <select class="choose_emotion" required>
+                <option value="happy">Happy</option>
+                <option value="sad">Sad</option>
+                <option value="normal">Normal</option>
+            </select></div>
+        <button type="submit" class="submit_btn">analyze!</button>
+
+
+    </div>
+</form>
+-->
+<!--
+<h1>Register</h1>
+      <p>Please fill in this form to create an account.</p>
+      <hr>
+
+      <label for="username"><b>User Name</b></label>
+      <input type="text" placeholder="Enter User Name" name="username" id="username" required>
+      -->
+
+<div class="container">
     {% if g.user %}
-        <p>analyze {{ file_name }}:</p>
-        <form method="post">
-            <label for="algorithm">Choose an algorithm:</label>
-            <select onchange="yesnoCheck(this);" name="algorithm" id="algorithm" required>
-                <option value="VAD">VAD</option>
-                <option value="Specific_Sounds">Specific Sounds</option>
-                <option value="Key_Words">Key Words</option>
-            </select>
-            <div id="VAD" style="display: block;">
-                <p>VAD</p>
-            </div>
-            <div id="Key_Words" style="display: none;">
-                <label>Choose word to search:</label>
-                <input name="word" id="word">
-            </div>
-            <div id="Specific_Sounds" style="display: none;">
-                <label>Choose specific emotion to search:</label>
-                <input name="sound" id="sound">
-            </div>
-            <input type="submit" value="Submit">
-        </form>
+    <p>analyze {{ file_name }}:</p>
+    <form method="post">
+        <label for="algorithm"><b>Choose an algorithm:</b></label>
+        <select onchange="yesnoCheck(this);" name="algorithm" id="algorithm" required>
+            <option value="VAD">VAD</option>
+            <option value="Specific_Sounds">Specific Sounds</option>
+            <option value="Key_Words">Key Words</option>
+        </select>
+        <div id="VAD" style="display: block;">
+            <p>VAD</p>
+        </div>
+        <div id="Key_Words" style="display: none;">
+            <label><b>Choose word to search:</b></label>
+            <input type="text" name="word" id="word" placeholder="Choose Word">
+        </div>
+        <div id="Specific_Sounds" style="display: none;">
+            <label><b>Choose specific emotion to search:</b></label>
+            <select id="sound" name="sound" class="choose_emotion" required>
+                <option value="happy">Happy</option>
+                <option value="sad">Sad</option>
+                <option value="normal">Normal</option>
+            </select></div>
+        <button type="submit" class="submit_btn">analyze!</button>
+    </form>
     {% endif %}
-    </div>{{answer}}</div>
+</div>{{answer}}</div>
+
 
 {% endblock %}

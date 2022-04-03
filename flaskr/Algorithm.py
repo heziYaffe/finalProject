@@ -27,19 +27,22 @@ class Algorithm:
         for i, audio_chunk in enumerate(chunks):
             # export audio chunk and save it in the chunk's directory.
             chunk_filename = h.save_audio_chunk(chunks_dir_path, file_name, audio_chunk, i)
+            print(chunk_filename)
 
             chunk_end = chunk_start
             chunk_start = chunk_end + len(audio_chunk) / 1000
-            chunks_at_original_audio.append((chunk_end, chunk_start))
+            chunks_at_original_audio.append((round(chunk_end), round(chunk_start)))
             if self.filter(chunk_filename, param):
                 param_indexs.append((i, param))
 
         return param_indexs, i, chunks_at_original_audio
 
-    def find_specific_object(self, upload_dir_path, chunks_dir_path, file_name, param):
+    def find_specific_object(self, upload_dir_path, chunks_dir_path, file_name, param, alg_name):
+        print("base class")
         param_indexes, chunks_num, chunks_at_original_audio = self.get_large_audio_transcription(upload_dir_path, chunks_dir_path, param, file_name)
         if not param_indexes:
-            return f"audio file doesnt contain the word {param}"
+            print(f"audio file doesnt contain the word {param}")
+            return []
         new_segments = h.combine_similar_segments(h.get_relevant_chunks(param_indexes, chunks_num),
                                                 chunks_at_original_audio)
         file_name_without_format = h.remove_file_format_from_name(file_name)
@@ -53,7 +56,9 @@ class Algorithm:
             # the created file contain all the chunks from X to Y
             # filename_chunkX.wav - filename_chunkY.wav
             segment_interval = segment[0]
-            new_segment_name = h.create_audio_segment(segment_interval[0], segment_interval[1], chunks_dir_path, param, i, file_name_without_format)
-            audio_chunks.append(h.Audio_Chunk(new_segment_name, file_name, segment_original_time_interval))
+            new_segment_name = h.create_audio_segment(segment_interval[0], segment_interval[1],
+                                                      chunks_dir_path, param, i, file_name_without_format, alg_name)
+            audio_chunks.append(h.Audio_Chunk(new_segment_name, file_name, segment_original_time_interval, alg_name))
 
+        h.delete_chunks(chunks_dir_path, file_name_without_format)
         return audio_chunks
