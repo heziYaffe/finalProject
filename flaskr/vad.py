@@ -1,3 +1,4 @@
+'''
 import functools
 import os
 import pathlib
@@ -11,7 +12,7 @@ from flaskr.vad_algorithm import main
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flaskr.db import get_db
-
+'''
 #bp = Blueprint('vad', __name__, url_prefix='/vad')
 #bp = Blueprint('files', __name__, url_prefix='/files')
 
