@@ -1,0 +1,3 @@
+#!c:\users\mirit\pycharmprojects\finalcsproject\venv\scripts\python.exe
+from numba.pycc import main
+main()

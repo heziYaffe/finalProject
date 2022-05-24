@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+<!--{% block header %}
+  <h1>{% block title %}Home{% endblock %}</h1>
+{% endblock %}-->
+
+{% block content %}
+<body class="home">
+  <div id="div1"><img src="{{url_for('static', filename='images/children_home.jpg')}}"/></div>
+  <div id="div2"><p>gfgf</p></div>
+  <div id="div3"></div>
+  <div id="div4"><img src="{{url_for('static', filename='images/oldmen_weelchair_home.jpg')}}"/></div>
+</body>
+{% endblock %}

@@ -11,6 +11,8 @@ dropzone = Dropzone()
 
 ALGORITHMS = ["VAD", "a", "b"]
 
+
+
 def create_app(test_config=None):
     # creates the Flask instance,__name__ is the name of the current Python module.
     # The app needs to know where it’s located to set up some paths
