@@ -1,3 +1,4 @@
+
 import os
 from datetime import datetime
 
@@ -48,7 +49,7 @@ def upload():
         if error is None:
             # save file in upload directory
             f.save(os.path.join(current_app.config['UPLOADED_PATH'], f.filename))
-            print("the absoulte path of the new file you just upload is:")
+            print("the absolute path of the new file you just upload is:")
             print(os.path.abspath(os.path.join(current_app.config['UPLOADED_PATH'], f.filename)))
 
         flash(error)
@@ -80,7 +81,6 @@ def choose_file():
             'SELECT file_location FROM audio WHERE file_name = ? and user_id = ?',
             (file_name, session['user_id'],)
         ).fetchone()
-
         if f is None:
             error = f'File: {file_name} doesnt exist.'
 
@@ -223,5 +223,5 @@ def analyze(file_name):
 def download_file(original_file_name, file_name, alg_name):
     chunks_path = current_app.config['CHUNKS_PATH']
     path = os.path.join(chunks_path, original_file_name, alg_name)
-    print(f"Downold the file {file_name} from {path}")
+    print(f"Download the file {file_name} from {path}")
     return send_from_directory(path, file_name)
