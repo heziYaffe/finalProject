@@ -133,6 +133,13 @@ def filter_by2(alg, file_name, param, alg_name):
     audio_chunks = alg.find_specific_object(path_of_original_file, path_of_chunks_directory, file_name, param, alg_name)
     return audio_chunks
 
+'''
+analyze chosen file according to specific algorithm.
+when choosing VAD - no additional parameters requires, so param value will be None.
+when choosing Specific Sound - additional parameter require,
+so param value will be sound name (happy, sad, etc...)
+when choosing Key Words - additional parameter require - so param value will be word.
+'''
 @bp.route('/analyze/<string:file_name>', methods=('GET', 'POST'))
 def analyze(file_name):
     if request.method == 'POST':
@@ -144,7 +151,6 @@ def analyze(file_name):
             param = request.form['word']
             algorithm = Key_Words_Alg();
         else:
-            #alg == "Specific_Sounds":
             param = request.form['sound']
             algorithm = Emotions_Recognition_Alg();
         print("post")
@@ -152,73 +158,12 @@ def analyze(file_name):
         if alg_name == "Specific_Sounds":
             return render_template('files/analyze_emotion_results.html', file_name=file_name, audios=answer)
         else:
-            #return jsonify(chunks=[chunk.serialize() for chunk in answer])
-
             return render_template('files/analyze_results.html', file_name=file_name, audios=answer)
 
-        #return answer
-        #if alg == "VAD":
-         #   args = ['3', os.path.abspath(os.path.join(current_app.config['UPLOADED_PATH'], file_name))]
-          #  print("this is the path of the file we want to filter:\n")
-           # print(os.path.abspath(os.path.join(current_app.config['UPLOADED_PATH'], file_name)))
-            #main(args, current_app.config['CHUNKS_PATH'], file_name)
     return render_template('files/analyze.html', file_name=file_name)
 
 
-
-'''
-def filter_by(alg, file_name, param):
-    print(f"filter {file_name} according to {alg}")
-    path_of_original_file = current_app.config['UPLOADED_PATH']
-    #os.path.abspath(os.path.join(, file_name))
-    path_of_chunks_directory = current_app.config['CHUNKS_PATH']
-    args = ['3', path_of_original_file]
-
-    audio_chunks = alg.find_specific_object(path_of_original_file, path_of_chunks_directory, file_name, param)
-    print("here")
-    print(audio_chunks)
-    return audio_chunks
-
-
-
-
-
-@bp.route('/analyze/<string:file_name>', methods=('GET', 'POST'))
-def analyze(file_name):
-    if request.method == 'POST':
-        alg_name = request.form['algorithm']
-        if alg_name == "VAD":
-            param = "vad"
-            alg = Vad_Alg()
-        elif alg_name == "Key_Words":
-            param = request.form['word']
-            alg = Key_Words_Alg()
-        elif alg_name == "Specific_Sounds":
-            param = request.form['sound']
-            alg = Emotions_Recognition_Alg()
-        else:
-            print("Algorithm Not Valid")
-
-        print("post")
-        answer = filter_by(alg, file_name, param)
-        if alg_name == "Specific_Sounds":
-            return render_template('files/analyze_emotion_results.html', file_name=file_name, audios=answer)
-        else:
-            #return jsonify(chunks=[chunk.serialize() for chunk in answer])
-
-            return render_template('files/analyze_results.html', file_name=file_name, audios=answer)
-
-        #return answer
-        #if alg == "VAD":
-         #   args = ['3', os.path.abspath(os.path.join(current_app.config['UPLOADED_PATH'], file_name))]
-          #  print("this is the path of the file we want to filter:\n")
-           # print(os.path.abspath(os.path.join(current_app.config['UPLOADED_PATH'], file_name)))
-            #main(args, current_app.config['CHUNKS_PATH'], file_name)
-    return render_template('files/analyze.html', file_name=file_name)
-'''
-
-
-
+#send file from given source.
 @bp.route('/audio/<original_file_name>/<alg_name>/<file_name>')
 def download_file(original_file_name, file_name, alg_name):
     chunks_path = current_app.config['CHUNKS_PATH']

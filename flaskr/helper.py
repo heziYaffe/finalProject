@@ -64,13 +64,22 @@ def split_audio_to_chunks(upload_dir_path, file_name):
                               )
     return chunks
 
-# combine segment that contain each other into one segment
+# combine segment that contain each other into one segment.
+# segments is array of tuples (for example [(0, 1)] array with size 1)
+# such that every tuple represent the start of the segments and the end
+# of the segments (in chunks).
+# in the example above the segment start in audio_chunk 0 and end in audio_chunk 1
 def combine_similar_segments(segments, segments_interval):
+    print("\ncombine_similar_segments:")
+    print(f"segments {segments}")
+    print(f"segments_interval (from second x to second y in the original audio) {segments_interval}")
     new_segments = []
+    # initial start and end
     start = segments[0][0]
     end = segments[0][1]
-
-    for segment in segments:
+    '''
+    for i in range(len(segments) - 1):
+        segment = segments[i + 1]
         segment_start, segment_end = segment[0], segment[1]
         if segment_start <= end:
             end = segment_end
@@ -79,46 +88,89 @@ def combine_similar_segments(segments, segments_interval):
                                                 segments_interval[end][1])))
             start = segment_start
             end = segment_end
+    '''
 
-    if (start, end) not in new_segments:
+    # in first iteration segment_start <= end because
+    # they are the same (we initiailze start and end above to the values
+    # in the first segment)
+    # in the next iterations, if the new segment start before the current
+    # segment end, we combine them to 1 segment by assign the end value of current segment
+    # to the end value of the new segment.
+    # otherwise, we add the current segment to new_segments array and
+    # assign start and end to the value of the new segment
+    # for example:
+    # current_segment = (3,7)
+    # new_segment = (5, 8)
+    # 5 < 7 and therefore we combine the segments to
+    # (3, 8)
+    if len(segments) == 1:
         new_segments.append(((start, end), (int(segments_interval[start][0]),
                                             int(segments_interval[end][1]))))
+    else:
+        for segment in segments:
+            segment_start, segment_end = segment[0], segment[1]
+            if segment_start <= end:
+                end = segment_end
+                print(f"start is {start}")
+                print(f"end is {end}")
+            else:
+                new_segments.append(((start, end), (segments_interval[start][0],
+                                                    segments_interval[end][1])))
+                start = segment_start
+                end = segment_end
 
+        if (start, end) not in new_segments:
+            new_segments.append(((start, end), (int(segments_interval[start][0]),
+                                                int(segments_interval[end][1]))))
+
+    print("here")
+    print(f"new_segments {new_segments}")
     return new_segments
 
 
-# get the 3 chunks before and after the chunk that contain
+# get the chunk before and after the chunk that contain
 # the word
 def get_relevant_chunks(object_indexs, chunks_num):
+    print("\nget_relevant_chunks:")
+    print(f"object_indexs {object_indexs}")
+    print(f"chunks_num {chunks_num}")
+
     segments = []
     for i in object_indexs:
-        if i[0] > 2:
-            start = i[0] - 3
+        if i[0] > 1:
+            start = i[0] - 1
         else:
             start = 0
-        if i[0] > chunks_num - 2:
-            end = chunks_num
+        if i[0] < chunks_num - 1:
+            end = i[0] + 1
         else:
-            end = i[0] + 3
+            end = chunks_num - 1
 
         segment = (start, end)
         segments.append(segment)
+
     return segments
 
 
 # create new audio named "file_name" that is part of the original
 # audio in specific path
 def create_audio_segment(start, end, chunks_dir_path, word, segment_num, file_name, alg_name):
+    print("\ncreate_audio_segment:")
     create_alg_dir(chunks_dir_path, file_name, alg_name)
     word_segment = AudioSegment.empty()
-    for i in range(end + 1):
-        i = start + i
-        sound = AudioSegment.from_file(f'{chunks_dir_path}/{file_name}_chunk{i}.wav')
+
+    for i in range(start, end + 1):
+        print(f"chunk number {i}")
+        path = os.path.join(chunks_dir_path, f"{file_name}_chunk{i}.wav")
+        #path = f'{chunks_dir_path}/{file_name}_chunk{i}.wav'
+        sound = AudioSegment.from_file(path)
         word_segment += sound
+        print("path of chunk is: " + path)
+
     path = f"{chunks_dir_path}/{file_name}.wav/{alg_name}/{file_name}_{word}_{segment_num}.wav"
+    path = os.path.join(chunks_dir_path, f"{file_name}.wav", alg_name, f"{file_name}_{word}_{segment_num}.wav")
     print("path is: " + path)
     word_segment.export(path, format="wav")
-    #word_segment.export(f"C:\\Users\\Mirit\\PycharmProjects\\FinalCsProject\\audioChunks\\Welcome2.wav\\VAD/{file_name}_{word}_{segment_num}.wav", format="wav")
 
     return f"{file_name}_{word}_{segment_num}.wav"
 
@@ -132,6 +184,7 @@ def create_audio_segment(start, end, chunks_dir_path, word, segment_num, file_na
             break
             '''
 
+# delete all the chunks that used to create the new files
 def delete_chunks(chunks_dir_path, file_name):
     i = 0
     while True:

@@ -22,23 +22,20 @@ class Vad_Alg(Algorithm):
         param_indexes, chunks_num, chunks_at_original_audio = self.get_large_audio_transcription(upload_dir_path,
                                                                                                  chunks_dir_path, param,
                                                                                                  file_name)
-        print(param_indexes)
-        print(chunks_num)
-        print(chunks_at_original_audio)
+        print(f"param indexes {param_indexes}")
+        print(f"chunkes num {chunks_num}")
+        print(f"chunks_at_original_audio {chunks_at_original_audio}")
         if not param_indexes:
             print(f"audio file doesnt contain silence")
             return []
-
-
-
-
 
         audio_chunks = []
         for i, segment in enumerate(chunks_at_original_audio):
             start = segment[0]
             end = segment[1]
             interval = (start, end)
-            new_segment_name = h.create_audio_segment(0, i, chunks_dir_path, "vad",
+            print(f"interval is {interval}")
+            new_segment_name = h.create_audio_segment(i, i, chunks_dir_path, "vad",
                                                       i, file_name_without_format, alg_name)
             audio_chunks.append(h.Audio_Chunk(new_segment_name, file_name, interval, alg_name))
 

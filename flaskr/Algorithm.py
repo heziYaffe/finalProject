@@ -17,6 +17,7 @@ class Algorithm:
         file_name = h.remove_file_format_from_name(file_name)
 
         param_indexs = []
+
         # chunks start and end in the original audio file
         chunks_at_original_audio = []
 
@@ -35,11 +36,18 @@ class Algorithm:
             if self.filter(chunk_filename, param):
                 param_indexs.append((i, param))
 
-        return param_indexs, i, chunks_at_original_audio
+        return param_indexs, i+1, chunks_at_original_audio
 
     def find_specific_object(self, upload_dir_path, chunks_dir_path, file_name, param, alg_name):
         print("base class")
-        param_indexes, chunks_num, chunks_at_original_audio = self.get_large_audio_transcription(upload_dir_path, chunks_dir_path, param, file_name)
+        print("find_specific_object:")
+
+        param_indexes, chunks_num, chunks_at_original_audio = self.get_large_audio_transcription(upload_dir_path,
+                                                                                                 chunks_dir_path, param, file_name)
+        print(f"param_indexes {param_indexes}")
+        print(f"chunks_num {chunks_num}")
+        print(f"chunks_at_original_audio {chunks_at_original_audio}")
+
         if not param_indexes:
             print(f"audio file doesnt contain the word {param}")
             return []
@@ -49,6 +57,7 @@ class Algorithm:
 
         audio_chunks = []
         for i, segment in enumerate(new_segments):
+            print(f"segment {segment}")
             # segment time interval in original video
             segment_original_time_interval = segment[1]
 
