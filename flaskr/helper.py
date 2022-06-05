@@ -23,8 +23,30 @@ class Audio_Chunk:
         return {
             'file_name': self.file_name,
             'original_file_name': self.original_file_name,
+            'alg': self.alg,
             'original_interval': self.original_interval,
         }
+
+
+def de_serialize_audio_chunk(json):
+    file_name = json['file_name']
+    original_file_name = json['original_file_name']
+    alg = json['alg']
+    original_interval = json['original_interval']
+    return Audio_Chunk(file_name, original_file_name, original_interval, alg)
+
+def convert_seconds_to_time(num_of_seconds):
+    hours = int(num_of_seconds / (60 * 60))
+    num_of_seconds %= 60 * 60
+    minutes = int(num_of_seconds / 60)
+    num_of_seconds %= 60
+    seconds = int(num_of_seconds)
+    return time_format(hours, minutes, seconds)
+
+
+def time_format(hours, minutes, seconds):
+    return f"{hours}:{minutes}:{seconds}"
+
 
 def create_dir_in_path(parent_directory, dir_name):
     # Directory

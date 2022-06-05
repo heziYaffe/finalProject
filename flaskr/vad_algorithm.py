@@ -37,6 +37,7 @@ class Vad_Alg(Algorithm):
             print(f"interval is {interval}")
             new_segment_name = h.create_audio_segment(i, i, chunks_dir_path, "vad",
                                                       i, file_name_without_format, alg_name)
+            interval = (h.convert_seconds_to_time(start), h.convert_seconds_to_time(end))
             audio_chunks.append(h.Audio_Chunk(new_segment_name, file_name, interval, alg_name))
 
         h.delete_chunks(chunks_dir_path, file_name_without_format)

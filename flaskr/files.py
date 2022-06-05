@@ -1,6 +1,7 @@
 
 import os
 from datetime import datetime
+import boto3
 
 
 from flask import (
@@ -12,6 +13,9 @@ from flask import (
 from flaskr.key_words_algorithm import Key_Words_Alg
 from flaskr.emotions_reocgnition_algorithm import Emotions_Recognition_Alg
 from flaskr.vad_algorithm import Vad_Alg
+from flaskr.helper import convert_seconds_to_time
+from flaskr.helper import de_serialize_audio_chunk
+
 
 
 #from flaskr.emotions_reocgnition_algorithm import find_specific_emotion
@@ -23,9 +27,18 @@ from flaskr.db import get_db
 
 bp = Blueprint('files', __name__, url_prefix='/files')
 
+def upload_file_to_s3(file_storage):
+    print()
+    # s3_resource = boto3.resource(service_name='s3')
+    # object = s3_resource.Object('hezi1-flaskr', f'{username[0]}/{f.filename}')
+    # object.put(Body=f.read())
+
+    # s3 = boto3.resource(service_name='s3')
+    # s3.meta.client.upload_file(Filename=os.path.join(current_app.config['UPLOADED_PATH'], f.filename),
+    #                          Bucket='hezi1-flaskr', Key=f'{username[0]}/{f.filename}')
+
 @bp.route('/upload', methods=('GET', 'POST'))
 def upload():
-
     if request.method == 'POST':
         error = None
         # f is files storage
@@ -33,7 +46,15 @@ def upload():
         file_name = f.filename
         # file location relative to UPLOAD_PATH directory
         file_location = f"\\{file_name}"
+
         db = get_db()
+        cursur = db.cursor()
+        username = cursur.execute(
+            'SELECT username FROM user where id = ?', (int(session['user_id']),)
+        ).fetchone()
+        print(username[0])
+
+
         try:
             # insert file attributes (id of owner, name, location, upload date) into audios table
             db.execute(
@@ -49,6 +70,8 @@ def upload():
         if error is None:
             # save file in upload directory
             f.save(os.path.join(current_app.config['UPLOADED_PATH'], f.filename))
+
+            #upload_file_to_s3(f)
             print("the absolute path of the new file you just upload is:")
             print(os.path.abspath(os.path.join(current_app.config['UPLOADED_PATH'], f.filename)))
 
@@ -133,6 +156,36 @@ def filter_by2(alg, file_name, param, alg_name):
     audio_chunks = alg.find_specific_object(path_of_original_file, path_of_chunks_directory, file_name, param, alg_name)
     return audio_chunks
 
+
+def save_to_cloud():
+    print("save")
+
+'''
+display analyze results and give the user
+option to save some or all of the audio chunks in 
+cloud. 
+'''
+@bp.route('/<string:file_name>/results', methods=('GET', 'POST'))
+def results(file_name):
+    # saving chosen files in cloud
+    if request.method == 'POST':
+        save_to_cloud(request.form)
+
+    # display analyze results
+    print("Showing results...")
+
+    # restore data on audio chunks from user session
+    audios = session['audios']
+    ds_audios = []
+
+    # the data saved in user session in bytes,
+    # now we de serialize the data back to
+    # Audio Chunk objects
+    for chunk in audios:
+        ds_audios.append(de_serialize_audio_chunk(chunk))
+
+    return render_template('files/analyze_results.html', file_name=file_name, audios=ds_audios)
+
 '''
 analyze chosen file according to specific algorithm.
 when choosing VAD - no additional parameters requires, so param value will be None.
@@ -154,12 +207,24 @@ def analyze(file_name):
             param = request.form['sound']
             algorithm = Emotions_Recognition_Alg();
         print("post")
+
+        # apply algorithm on the original file and get
+        # results that suit to the algorithm (in case of Key Words we
+        # get audio chunks that contain the specific word, in case of VAD
+        # we chunks that contain voice)
         answer = filter_by2(algorithm, file_name, param, alg_name)
+        s_answer = []
+
+        # convert Audio Chunk objects to json in order to
+        # save the data about every chunk in the user session
+        for chunk in answer:
+            s_answer.append(chunk.serialize())
+        session['audios'] = s_answer
         if alg_name == "Specific_Sounds":
             return render_template('files/analyze_emotion_results.html', file_name=file_name, audios=answer)
         else:
-            return render_template('files/analyze_results.html', file_name=file_name, audios=answer)
-
+            #return render_template('files/analyze_results.html', file_name=file_name, audios=answer)
+            return redirect(url_for('files.results', file_name=file_name))
     return render_template('files/analyze.html', file_name=file_name)
 
 

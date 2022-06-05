@@ -7,11 +7,13 @@
 {% block content %}
 
 <div>
+    <form method="post">
     <table style="width:100%" class="table">
         <tr>
             <th>File Name</th>
             <th>Audio</th>
             <th>Segment At Original File</th>
+            <th>Save Chunk</th>
         </tr>
         {% for audio in audios %}
         <tr>
@@ -26,10 +28,14 @@
                 </audio>
             </td>
             <td>{{audio['original_interval']}}</td>
+            <td><input type="checkbox" name="file_name" value={{audio['file_name']}}></td>
         </tr>
         {% endfor %}
 
     </table>
+        <button type="submit" class="submit_btn">Save Chunks</button>
+    </form>
+
 </div>
 
 
