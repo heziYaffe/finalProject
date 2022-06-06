@@ -27,6 +27,9 @@ from flaskr.db import get_db
 
 bp = Blueprint('files', __name__, url_prefix='/files')
 
+def upload_file_to_cloud_from_disk(s3, path, key):
+    s3.meta.client.upload_file(Filename=path,
+                               Bucket='hezi1-flaskr', Key=key)
 def upload_file_to_s3(file_storage):
     print()
     # s3_resource = boto3.resource(service_name='s3')
@@ -46,13 +49,13 @@ def upload():
         file_name = f.filename
         # file location relative to UPLOAD_PATH directory
         file_location = f"\\{file_name}"
-
+        username = g.user['username']
         db = get_db()
-        cursur = db.cursor()
-        username = cursur.execute(
-            'SELECT username FROM user where id = ?', (int(session['user_id']),)
-        ).fetchone()
-        print(username[0])
+        #cursur = db.cursor()
+        #username = cursur.execute(
+         #   'SELECT username FROM user where id = ?', (int(session['user_id']),)
+        #).fetchone()
+        #print(username[0])
 
 
         try:
@@ -157,8 +160,22 @@ def filter_by2(alg, file_name, param, alg_name):
     return audio_chunks
 
 
-def save_to_cloud():
-    print("save")
+def save_to_cloud(files, original_file_name, alg_name):
+    user_name = g.user['username']
+    print(user_name)
+    s3 = boto3.resource(service_name='s3')
+    #s3.meta.client.upload_file(Filename=os.path.join(current_app.config['UPLOADED_PATH'], f.filename),
+     #                         Bucket='hezi1-flaskr', Key=f'{user_name[0]}/{f.filename}')
+    chunks_path = current_app.config['CHUNKS_PATH']
+    print("saving files:")
+    for f in files:
+        path = os.path.join(chunks_path, original_file_name, alg_name)
+        path = os.path.join(path, f)
+        print(f"path of saved file is: {path}")
+        key = f'{user_name}/{original_file_name}/{alg_name}/{f}'
+        #upload_file_to_cloud_from_disk(s3, path, key)
+        print(f"saved the file {f}")
+
 
 '''
 display analyze results and give the user
@@ -167,13 +184,6 @@ cloud.
 '''
 @bp.route('/<string:file_name>/results', methods=('GET', 'POST'))
 def results(file_name):
-    # saving chosen files in cloud
-    if request.method == 'POST':
-        save_to_cloud(request.form)
-
-    # display analyze results
-    print("Showing results...")
-
     # restore data on audio chunks from user session
     audios = session['audios']
     ds_audios = []
@@ -183,6 +193,17 @@ def results(file_name):
     # Audio Chunk objects
     for chunk in audios:
         ds_audios.append(de_serialize_audio_chunk(chunk))
+
+    alg_name = ds_audios[0].alg
+    original_file_name = ds_audios[0].original_file_name
+
+    # saving chosen files in cloud
+    if request.method == 'POST':
+        files_to_save = request.form.getlist('file_name')
+        save_to_cloud(files_to_save, original_file_name, alg_name)
+
+    # display analyze results
+    print("Showing results...")
 
     return render_template('files/analyze_results.html', file_name=file_name, audios=ds_audios)
 

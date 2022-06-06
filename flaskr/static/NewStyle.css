@@ -233,6 +233,17 @@ a.button:hover {
   border-radius: 12px;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
+#home_page_p {
+    padding: 35px 60px;
+    margin: auto;
+    width: 80%;
+    height: 40%
+    opacity: 0.9;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 a.start_analyze {
     padding: 35px 60px;
