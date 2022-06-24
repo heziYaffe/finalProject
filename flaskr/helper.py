@@ -36,13 +36,17 @@ def de_serialize_audio_chunk(json):
     return Audio_Chunk(file_name, original_file_name, original_interval, alg)
 
 def convert_seconds_to_time(num_of_seconds):
+    m, s = divmod(num_of_seconds, 60)
+    h, m = divmod(m, 60)
+    return f'{h:d}:{m:02d}:{s:02d}'
+    '''
     hours = int(num_of_seconds / (60 * 60))
     num_of_seconds %= 60 * 60
     minutes = int(num_of_seconds / 60)
     num_of_seconds %= 60
     seconds = int(num_of_seconds)
     return time_format(hours, minutes, seconds)
-
+    '''
 
 def time_format(hours, minutes, seconds):
     return f"{hours}:{minutes}:{seconds}"
@@ -75,14 +79,14 @@ def split_audio_to_chunks(upload_dir_path, file_name):
     path = os.path.join(upload_dir_path, file_name)
     # open the audio file using pydub
     sound = AudioSegment.from_wav(path)
-    # split audio sound where silence is 700 milliseconds or more and get chunks
+    # split audio sound where silence is 1000 milliseconds or more and get chunks
     chunks = split_on_silence(sound,
                               # experiment with this value for your target audio file
-                              min_silence_len=500,
+                              min_silence_len=1000,
                               # adjust this per requirement
-                              silence_thresh=sound.dBFS - 14,
+                              silence_thresh=sound.dBFS,
                               # keep the silence for 1 second, adjustable as well
-                              keep_silence=500,
+                              keep_silence=1000,
                               )
     return chunks
 
@@ -145,7 +149,6 @@ def combine_similar_segments(segments, segments_interval):
             new_segments.append(((start, end), (int(segments_interval[start][0]),
                                                 int(segments_interval[end][1]))))
 
-    print("here")
     print(f"new_segments {new_segments}")
     return new_segments
 

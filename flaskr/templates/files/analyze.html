@@ -16,23 +16,12 @@
         function yesnoCheck(algorithm) {
             if (algorithm.value == "VAD") {
                 show("VAD");
-                hide("Specific_Sounds");
-                document.getElementById('sound').removeAttribute('required');
                 hide("Key_Words");
                 document.getElementById('word').removeAttribute('required');
-            }
-            if (algorithm.value == "Specific_Sounds") {
-                show("Specific_Sounds");
-                document.getElementById('sound').setAttribute('required', '');
-                hide("Key_Words");
-                document.getElementById('word').removeAttribute('required');
-                hide("VAD");
             }
             if (algorithm.value == "Key_Words") {
                 show("Key_Words");
                 document.getElementById('word').setAttribute('required', '');
-                hide("Specific_Sounds");
-                document.getElementById('sound').removeAttribute('required');
                 hide("VAD");
             }
         }
@@ -43,55 +32,26 @@
 
 
 </script>
-<!--
-<form>
-    <div class="container">
-        <h1>Analyze</h1>
-        <p>Choose the features according you want to analyze the file.</p>
-        <p>Dont worry, the original file will not corrupt.</p>
-        <label for="algorithm"><b>Choose an algorithm:</b></label>
-        <select onchange="yesnoCheck(this);" name="algorithm" id="algorithm" class="choose_algorithm" required>
-            <option value="VAD">VAD</option>
-            <option value="Specific_Sounds">Specific Sounds</option>
-            <option value="Key_Words">Key Words</option>
-        </select>
-        <div id="VAD" style="display: block;">
-            <p>VAD</p>
-        </div>
-        <div id="Key_Words" style="display: none;">
-            <label><b>Choose word to search:</b></label>
-            <input name="word" id="word" class="choose_word">
-        </div>
-        <div id="Specific_Sounds" style="display: none;">
-            <label><b>Choose specific emotion to search:</b></label>
-            <select class="choose_emotion" required>
-                <option value="happy">Happy</option>
-                <option value="sad">Sad</option>
-                <option value="normal">Normal</option>
-            </select></div>
-        <button type="submit" class="submit_btn">analyze!</button>
-
-
-    </div>
-</form>
--->
-<!--
-<h1>Register</h1>
-      <p>Please fill in this form to create an account.</p>
-      <hr>
-
-      <label for="username"><b>User Name</b></label>
-      <input type="text" placeholder="Enter User Name" name="username" id="username" required>
-      -->
 
 <div class="container">
     {% if g.user %}
+    <pre>
+        Hello {{ user_name }}!
+
+        Right now there are two algorithms available for audio analyzing:
+
+        1. VAD - Voice Activity Detector.
+        2. Key Words - looking for specific words.
+
+        We recommend using the first one when the file you want to analyze
+        seems to contain a lot of "dead" parts like silence
+
+    </pre>
     <p>analyze {{ file_name }}:</p>
     <form method="post">
         <label for="algorithm"><b>Choose an algorithm:</b></label>
         <select onchange="yesnoCheck(this);" name="algorithm" id="algorithm" required>
             <option value="VAD">VAD</option>
-            <option value="Specific_Sounds">Specific Sounds</option>
             <option value="Key_Words">Key Words</option>
         </select>
         <div id="VAD" style="display: block;">
@@ -101,13 +61,6 @@
             <label><b>Choose word to search:</b></label>
             <input type="text" name="word" id="word" placeholder="Choose Word">
         </div>
-        <div id="Specific_Sounds" style="display: none;">
-            <label><b>Choose specific emotion to search:</b></label>
-            <select id="sound" name="sound" class="choose_emotion" required>
-                <option value="happy">Happy</option>
-                <option value="sad">Sad</option>
-                <option value="normal">Normal</option>
-            </select></div>
         <button type="submit" class="submit_btn">analyze!</button>
     </form>
     {% endif %}

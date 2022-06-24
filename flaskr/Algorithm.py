@@ -28,7 +28,6 @@ class Algorithm:
         for i, audio_chunk in enumerate(chunks):
             # export audio chunk and save it in the chunk's directory.
             chunk_filename = h.save_audio_chunk(chunks_dir_path, file_name, audio_chunk, i)
-            print(chunk_filename)
 
             chunk_end = chunk_start
             chunk_start = chunk_end + len(audio_chunk) / 1000
@@ -43,7 +42,8 @@ class Algorithm:
         print("find_specific_object:")
 
         param_indexes, chunks_num, chunks_at_original_audio = self.get_large_audio_transcription(upload_dir_path,
-                                                                                                 chunks_dir_path, param, file_name)
+                                                                                                 chunks_dir_path, param,
+                                                                                                 file_name)
         print(f"param_indexes {param_indexes}")
         print(f"chunks_num {chunks_num}")
         print(f"chunks_at_original_audio {chunks_at_original_audio}")
@@ -60,6 +60,8 @@ class Algorithm:
             print(f"segment {segment}")
             # segment time interval in original video
             segment_original_time_interval = segment[1]
+            segment_original_time_interval = (h.convert_seconds_to_time(segment_original_time_interval[0]),
+                                              h.convert_seconds_to_time(segment_original_time_interval[1]))
 
             # segment interval - tuple (x, y)
             # the created file contain all the chunks from X to Y

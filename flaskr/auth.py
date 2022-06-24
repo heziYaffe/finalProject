@@ -172,8 +172,12 @@ def register():
             try:
                 # takes a SQL query with ? placeholders for any user input,
                 # and a tuple of values to replace the placeholders with.
-                db.execute(
-                    "INSERT INTO user (username, password) VALUES (?, ?)",
+                #db.execute(
+                 #   "INSERT INTO user (username, password) VALUES (?, ?)",
+                  #  (username, generate_password_hash(password)),
+                #)
+                db.cursor().execute(
+                    """INSERT INTO users (username, password) VALUES (%s, %s);""",
                     (username, generate_password_hash(password)),
                 )
                 # save the changes in DB.
@@ -200,14 +204,23 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+
         db = get_db()
         error = None
 
         # fetchone() returns one row from the query.
         # If the query returned no results, it returns None.
-        user = db.execute(
-            'SELECT * FROM user WHERE username = ?', (username,)
-        ).fetchone()
+        curr = db.cursor()
+        curr.execute(
+            """SELECT * FROM users WHERE username = (%s);""", (username,)
+        )
+        user = curr.fetchone()
+
+        # fetchone() returns one row from the query.
+        # If the query returned no results, it returns None.
+        #user = db.execute(
+         #   'SELECT * FROM user WHERE username = ?', (username,)
+        #).fetchone()
 
         if user is None:
             error = 'Incorrect username.'
@@ -240,9 +253,14 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        g.user = get_db().execute(
-            'SELECT * FROM user WHERE id = ?', (user_id,)
-        ).fetchone()
+        curr = get_db().cursor()
+        curr.execute(
+            """SELECT * FROM users WHERE id = (%s);""", (user_id,)
+        )
+        g.user = curr.fetchone()
+        #g.user = get_db().execute(
+         #   'SELECT * FROM user WHERE id = ?', (user_id,)
+        #).fetchone()
 
 @bp.route('/logout')
 def logout():

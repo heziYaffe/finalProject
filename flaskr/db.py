@@ -98,8 +98,10 @@ def close_db(e=None):
 import sqlite3
 
 import click
+import psycopg2
 from flask import current_app, g
 from flask.cli import with_appcontext
+from psycopg2.extras import RealDictCursor
 
 
 def get_db():
@@ -113,13 +115,20 @@ def get_db():
         # get_db will be called when the application has been created and is handling a request, so current_app can be used
 
         # establishes a connection to the file pointed at by the DATABASE configuration key
-        g.db = sqlite3.connect(
-            current_app.config['DATABASE'],
-            detect_types=sqlite3.PARSE_DECLTYPES
-        )
+        #g.db = sqlite3.connect(
+         #   current_app.config['DATABASE'],
+          #  detect_types=sqlite3.PARSE_DECLTYPES
+        #)
 
         # tells the connection to return rows that behave like dicts. This allows accessing the columns by name.
-        g.db.row_factory = sqlite3.Row
+        #g.db.row_factory = sqlite3.Row
+
+        conn = psycopg2.connect(host='ec2-3-228-235-79.compute-1.amazonaws.com',
+                                database='d44176tbc8sl5d',
+                                user='pqkykfpufawecb',
+                                password='d12ea022294161269a064919c304051290c19992cc4f48d28d62cd38bdba67c7',
+                                cursor_factory=RealDictCursor)
+        g.db = conn
 
     return g.db
 

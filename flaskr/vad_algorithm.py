@@ -11,6 +11,49 @@ class Vad_Alg(Algorithm):
         print("find_specific_object")
         return self.split_by_silence(upload_dir_path, chunks_dir_path, file_name, param, alg_name)
 
+    '''
+    def split_by_silence(self, upload_dir_path, chunks_dir_path, file_name, param, alg_name):
+        print("split_by_silence")
+
+        file_name_without_format = h.remove_file_format_from_name(file_name)
+
+        audio_chunks_path = h.create_alg_dir(chunks_dir_path, file_name_without_format, "VAD")
+        print(f"audio chunk path is: {audio_chunks_path}")
+
+        param_indexes, chunks_num, chunks_at_original_audio = self.get_large_audio_transcription(upload_dir_path,
+                                                                                                 chunks_dir_path, param,
+                                                                                                 file_name)
+
+        new_segments = h.combine_similar_segments(h.get_relevant_chunks(param_indexes, chunks_num),
+                                                  chunks_at_original_audio)
+
+        print(f"param indexes {param_indexes}")
+        print(f"chunkes num {chunks_num}")
+        print(f"chunks_at_original_audio {chunks_at_original_audio}")
+        if not param_indexes:
+            print(f"audio file doesnt contain silence")
+            return []
+
+        audio_chunks = []
+        for i, segment in enumerate(new_segments):
+            print(f"segment {segment}")
+            # segment time interval in original video
+            segment_original_time_interval = segment[1]
+            segment_original_time_interval = (h.convert_seconds_to_time(segment_original_time_interval[0]),
+                                              h.convert_seconds_to_time(segment_original_time_interval[1]))
+
+            # segment interval - tuple (x, y)
+            # the created file contain all the chunks from X to Y
+            # filename_chunkX.wav - filename_chunkY.wav
+            segment_interval = segment[0]
+            new_segment_name = h.create_audio_segment(segment_interval[0], segment_interval[1],
+                                                      chunks_dir_path, param, i, file_name_without_format, alg_name)
+            audio_chunks.append(h.Audio_Chunk(new_segment_name, file_name, segment_original_time_interval, alg_name))
+
+        h.delete_chunks(chunks_dir_path, file_name_without_format)
+        return audio_chunks
+    '''
+
     def split_by_silence(self, upload_dir_path, chunks_dir_path, file_name, param, alg_name):
         print("split_by_silence")
 
@@ -30,6 +73,7 @@ class Vad_Alg(Algorithm):
             return []
 
         audio_chunks = []
+        
         for i, segment in enumerate(chunks_at_original_audio):
             start = segment[0]
             end = segment[1]

@@ -27,9 +27,16 @@ from flaskr.db import get_db
 
 bp = Blueprint('files', __name__, url_prefix='/files')
 
+def download_file_from_cloud_to_disk(key):
+    s3 = boto3.client("s3")
+    s3.download_file(
+        Bucket="hezi1-flaskr", Key=key, Filename="data/downloaded_from_s3.csv"
+    )
+
 def upload_file_to_cloud_from_disk(s3, path, key):
     s3.meta.client.upload_file(Filename=path,
                                Bucket='hezi1-flaskr', Key=key)
+
 def upload_file_to_s3(file_storage):
     print()
     # s3_resource = boto3.resource(service_name='s3')
@@ -60,11 +67,17 @@ def upload():
 
         try:
             # insert file attributes (id of owner, name, location, upload date) into audios table
+            # insert file attributes (id of owner, name, location, upload date) into audios table
+            db.cursor().execute(
+                """INSERT INTO audios (user_id, file_name, file_location, upload_date) VALUES (%s, %s, %s, %s);""",
+                (session['user_id'], file_name, file_location, datetime.today().strftime('%Y-%m-%d')),
+            )
+            '''
             db.execute(
                 "INSERT INTO audio (user_id, file_name, file_location, upload_date) VALUES (?, ?, ?, ?)",
                 (session['user_id'], file_name, file_location, datetime.today().strftime('%Y-%m-%d')),
             )
-
+            '''
             db.commit()
 
         except db.IntegrityError:
@@ -91,10 +104,11 @@ def index():
 def choose_file():
     db = get_db()
     # get all the audio files that the user upload
-    audios = db.execute(
-        'SELECT * FROM audio where user_id = ?', (int(session['user_id']),)
-    ).fetchall()
-
+    curr = db.cursor()
+    curr.execute(
+        'SELECT * FROM audios where user_id = (%s)', (int(session['user_id']),)
+    )
+    audios = curr.fetchall()
     if request.method == 'POST':
         # name of the chosen file
         file_name = request.form['file_name']
@@ -103,10 +117,11 @@ def choose_file():
 
         # get location of the given file if it exists
         # f is sqlite3.Row object
-        f = db.execute(
-            'SELECT file_location FROM audio WHERE file_name = ? and user_id = ?',
+        curr.execute(
+            'SELECT file_location FROM audios WHERE file_name = (%s) and user_id = (%s)',
             (file_name, session['user_id'],)
-        ).fetchone()
+        )
+        f = curr.fetchone()
         if f is None:
             error = f'File: {file_name} doesnt exist.'
 
@@ -163,18 +178,46 @@ def filter_by2(alg, file_name, param, alg_name):
 def save_to_cloud(files, original_file_name, alg_name):
     user_name = g.user['username']
     print(user_name)
+
     s3 = boto3.resource(service_name='s3')
     #s3.meta.client.upload_file(Filename=os.path.join(current_app.config['UPLOADED_PATH'], f.filename),
      #                         Bucket='hezi1-flaskr', Key=f'{user_name[0]}/{f.filename}')
     chunks_path = current_app.config['CHUNKS_PATH']
     print("saving files:")
+    db = get_db()
+    curr = db.cursor()
     for f in files:
         path = os.path.join(chunks_path, original_file_name, alg_name)
         path = os.path.join(path, f)
         print(f"path of saved file is: {path}")
         key = f'{user_name}/{original_file_name}/{alg_name}/{f}'
         #upload_file_to_cloud_from_disk(s3, path, key)
+        curr.execute(
+            """INSERT INTO audios (user_id, file_name, file_location, upload_date) VALUES (%s, %s, %s, %s);""",
+            (session['user_id'], f, key, datetime.today().strftime('%Y-%m-%d')),
+        )
+
         print(f"saved the file {f}")
+
+def get_audios_by_user_id(curr):
+    curr.execute('SELECT * FROM audios where user_id = (%s)', (int(session['user_id']),)
+                 )
+
+def get_audios_by_parent_file(curr, parent_file):
+    curr.execute('SELECT * FROM audios where user_id = (%s)'
+                 ' and original original_file_name=(%s)', (int(session['user_id']), parent_file,)
+                 )
+
+def get_audios_by_upload_date_asc_order(curr):
+    curr.execute('SELECT * FROM audios ORDER BY upload_date ASC where user_id = (%s);'
+                 , (int(session['user_id']),)
+                 )
+
+def get_audios_by_upload_date(curr, upload_date):
+    curr.execute('SELECT * FROM audios where user_id = (%s)'
+                 'and upload_date =(%s)'
+                 , (int(session['user_id']), upload_date,)
+                 )
 
 
 '''
