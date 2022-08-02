@@ -135,9 +135,14 @@ def get_db():
 def init_db():
     # returns a database connection, which is used to execute the commands read from the file.
     db = get_db()
+    curr = db.cursor()
+
+    curr.execute(
+        'CREATE TABLE IF NOT EXISTS users (id SERIAL, username text UNIQUE NOT NULL, password text NOT NULL)'
+    )
     # opens a file relative to the flaskr package.
-    with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
+    #with current_app.open_resource('schema.sql') as f:
+     #   db.executescript(f.read().decode('utf8'))
 
 # defines a command line command called init-db that calls the
 # init_db function and shows a success message to the user.

@@ -18,7 +18,8 @@ ul.horizontal li a {
     text-decoration: none;
 }
 
-/*ul.horizontal li a:hover:not(.active) {
+/*
+ul.horizontal li a:hover:not(.active) {
     background-color: #000;
 }
 
@@ -26,15 +27,52 @@ ul.horizontal li a.active {
     background-color:#04AA6D;
 }
 */
+
+li.home a:hover:not(.active) {
+    background-color: #000;
+}
+
+li.home a.active {
+    background-color:#04AA6D;
+}
+
+li.options a:hover:not(.active) {
+    background-color: #000;
+}
+
+li.options a.active {
+    background-color:#04AA6D;
+}
+
+li.register a:hover:not(.active) {
+    background-color: #000;
+}
+
+li.register a.active {
+    background-color:#04AA6D;
+}
+
+li.log_in a:hover:not(.active) {
+    background-color: #000;
+}
+
+li.log_in a.active {
+    background-color:#04AA6D;
+}
+
+/*
 #horizontal ul li:hover,
 body.home li.home,
 body.register li.register,
+body.options li.options,
 body.log_in li.log_in { background-color: #000;}
 
 #horizontal ul li:hover a,
 body.home li.home a,
 body.register li.register a,
+body.options li.options a,
 body.log_in li.log_in a { color: #fff; }
+*/
 
 .content {
     height: 92%;
@@ -67,6 +105,10 @@ username {
 }
 
 body.register {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body.options {
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -233,6 +275,7 @@ a.button:hover {
   border-radius: 12px;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
+
 #home_page_p {
     padding: 35px 60px;
     margin: auto;
@@ -243,6 +286,8 @@ a.button:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
 }
 
 a.start_analyze {

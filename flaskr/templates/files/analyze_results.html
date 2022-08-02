@@ -12,7 +12,7 @@
         <tr>
             <th>File Name</th>
             <th>Audio</th>
-            <th>Segment At Original File</th>
+            <!--<th>Segment At Original File</th>-->
             <th>Save Chunk</th>
         </tr>
         {% for audio in audios %}
@@ -27,7 +27,7 @@
                     Your browser does not support the audio element.!-->
                 </audio>
             </td>
-            <td>({{audio['original_interval'][0]}}, {{audio['original_interval'][1]}}) </td>
+            <!--<td>({{audio['original_interval'][0]}}, {{audio['original_interval'][1]}}) </td>-->
             <td><input type="checkbox" name="file_name" value={{audio['file_name']}}></td>
         </tr>
         {% endfor %}

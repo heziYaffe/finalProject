@@ -9,8 +9,7 @@ class Algorithm:
     # a function that splits the audio file into chunks
     # and applies speech recognition
     def get_large_audio_transcription(self, upload_dir_path, chunks_dir_path, param, file_name):
-        # C:\Users\Mirit\PycharmProjects\FinalCsProject\uploads\Welcome2.wav
-        # Welcome.wav
+
         chunks = h.split_audio_to_chunks(upload_dir_path, file_name)
 
         # remove format from file name (.wav, mp3 etc...)

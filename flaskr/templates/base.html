@@ -1,15 +1,18 @@
 <!doctype html>
-<title>{% block title %}{% endblock %} - Flaskr</title>
+<title>{% block title %}{% endblock %} - ChildProtect</title>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicons/favicon.ico') }}">
+
 <link rel="stylesheet" href="{{ url_for('static', filename='NewStyle.css') }}">
 <nav>
   <ul class="horizontal">
       <li class="home"><a href="{{ url_for('home.index') }}">Home</a>
     {% if g.user %}
       <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
+      <li class="options"><a href="{{ url_for('files.index') }}">Options</a>
       <li><a>{{ g.user['username'] }}</a>
     {% else %}
       <li class="register"><a href="{{ url_for('auth.register') }}">Register</a>
-      <li class="log_in"><a href="{{ url_for('auth.login') }}">Log In</a>
+      <li class="log_in"><a href="{{ url_for('auth.login') }}">Sign In</a>
     {% endif %}
   </ul>
 </nav>

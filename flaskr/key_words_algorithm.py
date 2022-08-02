@@ -8,7 +8,6 @@ class Key_Words_Alg(Algorithm):
 
     def filter(self, chunk_filename, word):
         text = self.convert_audio_to_text(chunk_filename)
-       # print(text)
         if text != None:
             if word in text:
                 return True

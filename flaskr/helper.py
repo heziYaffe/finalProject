@@ -77,6 +77,8 @@ def create_alg_dir(chunks_dir_path, file_name, alg):
 
 def split_audio_to_chunks(upload_dir_path, file_name):
     path = os.path.join(upload_dir_path, file_name)
+    print(f"split_audio_to_chunks path is: {path}")
+
     # open the audio file using pydub
     sound = AudioSegment.from_wav(path)
     # split audio sound where silence is 1000 milliseconds or more and get chunks
